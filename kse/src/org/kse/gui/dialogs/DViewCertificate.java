@@ -19,18 +19,16 @@
  */
 package org.kse.gui.dialogs;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
@@ -46,25 +44,15 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import net.miginfocom.swing.MigLayout;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.encoders.Hex;
-import org.kse.gui.preferences.ApplicationSettings;
 import org.kse.KSE;
 import org.kse.crypto.CryptoException;
 import org.kse.crypto.KeyInfo;
@@ -85,11 +73,10 @@ import org.kse.gui.crypto.JCertificateFingerprint;
 import org.kse.gui.crypto.JDistinguishedName;
 import org.kse.gui.dialogs.extensions.DViewExtensions;
 import org.kse.gui.error.DError;
+import org.kse.gui.preferences.ApplicationSettings;
 import org.kse.utilities.DialogViewer;
 import org.kse.utilities.StringUtils;
 import org.kse.utilities.asn1.Asn1Exception;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Displays the details of one or more X.509 certificates. The details of one
@@ -537,6 +524,20 @@ public class DViewCertificate extends JEscDialog {
             jbAsn1.setEnabled(true);
 
             try {
+                KeyInfo keyInfo;
+                if (this.kseFrame != null && this.kseFrame.getActiveKeyStore() != null) {
+                    KeyStore activeKeyStore = this.kseFrame.getActiveKeyStore();
+                    String selectedEntryAlias = this.kseFrame.getSelectedEntryAlias();
+                    if (selectedEntryAlias != null) {
+                        Certificate certificate = activeKeyStore.getCertificate(selectedEntryAlias);
+                        keyInfo = KeyPairUtil.getKeyInfo(certificate.getPublicKey());
+                    } else {
+                        keyInfo = KeyPairUtil.getKeyInfo(cert.getPublicKey());
+                    }
+                } else {
+                    keyInfo = KeyPairUtil.getKeyInfo(cert.getPublicKey());
+                }
+
                 Date currentDate = new Date();
 
                 Date startDate = cert.getNotBefore();
@@ -582,7 +583,6 @@ public class DViewCertificate extends JEscDialog {
                 }
                 jtfValidUntil.setCaretPosition(0);
 
-                KeyInfo keyInfo = KeyPairUtil.getKeyInfo(cert.getPublicKey());
                 jtfPublicKey.setText(keyInfo.getAlgorithm());
                 Integer keySize = keyInfo.getSize();
 
@@ -620,7 +620,7 @@ public class DViewCertificate extends JEscDialog {
                 } else {
                     jbExtensions.setEnabled(false);
                 }
-            } catch (CryptoException e) {
+            } catch (CryptoException | KeyStoreException e) {
                 DError.displayError(this, e);
                 dispose();
             }

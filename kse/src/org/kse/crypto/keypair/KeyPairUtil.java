@@ -19,15 +19,6 @@
  */
 package org.kse.crypto.keypair;
 
-import static org.kse.crypto.KeyType.ASYMMETRIC;
-import static org.kse.crypto.ecc.EdDSACurves.ED25519;
-import static org.kse.crypto.ecc.EdDSACurves.ED448;
-import static org.kse.crypto.keypair.KeyPairType.DSA;
-import static org.kse.crypto.keypair.KeyPairType.EC;
-import static org.kse.crypto.keypair.KeyPairType.ECDSA;
-import static org.kse.crypto.keypair.KeyPairType.EDDSA;
-import static org.kse.crypto.keypair.KeyPairType.RSA;
-
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -48,6 +39,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.kse.KSE;
@@ -55,6 +47,12 @@ import org.kse.crypto.CryptoException;
 import org.kse.crypto.KeyInfo;
 import org.kse.crypto.ecc.EccUtil;
 import org.kse.crypto.ecc.EdDSACurves;
+import org.kse.crypto.pqc.OQSUtils;
+
+import static org.kse.crypto.KeyType.ASYMMETRIC;
+import static org.kse.crypto.ecc.EdDSACurves.ED25519;
+import static org.kse.crypto.ecc.EdDSACurves.ED448;
+import static org.kse.crypto.keypair.KeyPairType.*;
 
 /**
  * Provides utility methods relating to asymmetric key pairs.
@@ -214,6 +212,16 @@ public final class KeyPairUtil {
             } else if (EDDSA.jce().equalsIgnoreCase(algorithm)) { // JRE 15 or higher
                 EdDSACurves edDSACurve = EccUtil.detectEdDSACurve(publicKey);
                 return new KeyInfo(ASYMMETRIC, edDSACurve.jce(), edDSACurve.bitLength());
+            } else if (algorithm.equals(P384_DILITHIUM3.oid()) ||
+                       algorithm.equals(P256_DILITHIUM2.oid()) ||
+                       algorithm.equals(P521_DILITHIUM5.oid())) {
+                KeyPairType keyPairType = OQSUtils.KEYPAIR_TYPE_BY_OID.get(algorithm);
+                return new KeyInfo(ASYMMETRIC, keyPairType.name().toLowerCase(Locale.getDefault()), keyPairType.maxSize(), keyPairType.name().toLowerCase(Locale.ROOT));
+            } else if (algorithm.equals(P384_DILITHIUM3.name().toLowerCase(Locale.ROOT)) ||
+                       algorithm.equals(P256_DILITHIUM2.name().toLowerCase(Locale.ROOT)) ||
+                       algorithm.equals(P521_DILITHIUM5.name().toLowerCase(Locale.ROOT))) {
+                KeyPairType keyPairType = OQSUtils.KEYPAIR_TYPE_BY_NAME.get(algorithm);
+                return new KeyInfo(ASYMMETRIC, keyPairType.name().toLowerCase(Locale.getDefault()), keyPairType.maxSize(), keyPairType.name().toLowerCase(Locale.ROOT));
             }
 
             return new KeyInfo(ASYMMETRIC, algorithm); // size unknown
@@ -261,6 +269,16 @@ public final class KeyPairUtil {
             } else if (EDDSA.jce().equalsIgnoreCase(algorithm)) { // JRE 15 or higher
                 EdDSACurves edDSACurve = EccUtil.detectEdDSACurve(privateKey);
                 return new KeyInfo(ASYMMETRIC, edDSACurve.jce(), edDSACurve.bitLength());
+            } else if (algorithm.equals(P384_DILITHIUM3.oid()) ||
+                      algorithm.equals(P256_DILITHIUM2.oid()) ||
+                      algorithm.equals(P521_DILITHIUM5.oid())) {
+                KeyPairType keyPairType = OQSUtils.KEYPAIR_TYPE_BY_OID.get(algorithm);
+                return new KeyInfo(ASYMMETRIC, keyPairType.name().toLowerCase(Locale.getDefault()), keyPairType.maxSize(), keyPairType.name().toLowerCase(Locale.ROOT));
+            } else if (algorithm.equals(P384_DILITHIUM3.name().toLowerCase(Locale.ROOT)) ||
+                       algorithm.equals(P256_DILITHIUM2.name().toLowerCase(Locale.ROOT)) ||
+                       algorithm.equals(P521_DILITHIUM5.name().toLowerCase(Locale.ROOT))) {
+                KeyPairType keyPairType = OQSUtils.KEYPAIR_TYPE_BY_NAME.get(algorithm);
+                return new KeyInfo(ASYMMETRIC, keyPairType.name().toLowerCase(Locale.getDefault()), keyPairType.maxSize(), keyPairType.name().toLowerCase(Locale.ROOT));
             }
 
             return new KeyInfo(ASYMMETRIC, algorithm); // size unknown
@@ -286,7 +304,7 @@ public final class KeyPairUtil {
      * @param privateKey Private key
      * @param publicKey  Public key
      * @return True if the private and public keys comprise a valid key pair,
-     *         false otherwise.
+     * false otherwise.
      * @throws CryptoException If there is a problem validating the key pair
      */
     public static boolean validKeyPair(PrivateKey privateKey, PublicKey publicKey) throws CryptoException {
@@ -317,10 +335,22 @@ public final class KeyPairUtil {
                 EdDSACurves detectedEdDSACurve = EccUtil.detectEdDSACurve(privateKey);
                 byte[] signature = sign(toSign, privateKey, detectedEdDSACurve.jce());
                 return verify(toSign, signature, publicKey, detectedEdDSACurve.jce());
+            } else if (privateAlgorithm.equals(P384_DILITHIUM3.oid()) ||
+                       privateAlgorithm.equals(P256_DILITHIUM2.oid()) ||
+                       privateAlgorithm.equals(P521_DILITHIUM5.oid())) {
+                PrivateKey oqsPrivateKeyFromPEM = OQSUtils.getOQSPrivateKeyFromPEM(privateKey.getEncoded());
+                PublicKey oqsPublicKey1 = OQSUtils.getOQSPublicKeyFromPublicKey(publicKey.getEncoded());
+                return true;
+            } else if (privateAlgorithm.equals(P384_DILITHIUM3.name().toLowerCase(Locale.ROOT)) ||
+                       privateAlgorithm.equals(P256_DILITHIUM2.name().toLowerCase(Locale.ROOT)) ||
+                       privateAlgorithm.equals(P521_DILITHIUM5.name().toLowerCase(Locale.ROOT))) {
+                PrivateKey oqsPrivateKeyFromPEM = OQSUtils.getOQSPrivateKeyFromPEM(privateKey.getEncoded());
+                PublicKey oqsPublicKey1 = OQSUtils.getOQSPublicKeyFromPublicKey(publicKey.getEncoded());
+                return true;
             } else {
                 throw new CryptoException(
                         MessageFormat.format(res.getString("NoCheckCompriseValidKeypairAlg.exception.message"),
-                                             privateAlgorithm));
+                                privateAlgorithm));
             }
         } catch (GeneralSecurityException ex) {
             throw new CryptoException(res.getString("NoCheckCompriseValidKeypair.exception.message"), ex);

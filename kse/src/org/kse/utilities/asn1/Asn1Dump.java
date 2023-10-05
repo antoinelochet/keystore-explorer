@@ -35,32 +35,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Null;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.BERTaggedObject;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERGeneralString;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERNumericString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.DERUniversalString;
-import org.bouncycastle.asn1.DERVisibleString;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.util.encoders.Hex;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.crypto.x509.X509Ext;
 import org.kse.utilities.io.HexUtil;
 import org.kse.utilities.io.IndentChar;
@@ -164,6 +141,12 @@ public class Asn1Dump {
      * @throws IOException   If an I/O problem occurred
      */
     public String dump(PublicKey publicKey) throws Asn1Exception, IOException {
+        if (publicKey instanceof OQSUtils.OQSPublicKey) {
+            OQSUtils.OQSPublicKey oqsPublicKey = (OQSUtils.OQSPublicKey) publicKey;
+            String ecDump = dump(oqsPublicKey.getClassicPublicKey().getEncoded());
+            String diliDump = dumpOctetString(new DEROctetString(oqsPublicKey.getPqcPublicKey().getEncoded()));
+            return  "EC ASN.1 dump: " + ecDump + "\nDilithium ASN.1 dump: "+ diliDump;
+        }
         return dump(publicKey.getEncoded());
     }
 

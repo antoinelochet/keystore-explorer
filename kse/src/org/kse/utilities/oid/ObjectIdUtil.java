@@ -1574,6 +1574,9 @@ public class ObjectIdUtil {
         oidToNameMapping.put("1.3.6.1.4.1.8231.1", "RolUnicoNacional");
         oidToNameMapping.put("1.3.6.1.4.1.8301.3.5.1", "ValidityModelChain");
         oidToNameMapping.put("1.3.6.1.4.1.8301.3.5.2", "ValidityModelShell");
+        oidToNameMapping.put("1.3.6.1.4.1.2.267.7.4.4", "Dilithium2");
+        oidToNameMapping.put("1.3.6.1.4.1.2.267.7.6.5", "Dilithium3");
+        oidToNameMapping.put("1.3.6.1.4.1.2.267.7.8.7", "Dilithium5");
         oidToNameMapping.put("1.3.6.1.5.5.7", "Pkix");
         oidToNameMapping.put("1.3.6.1.5.5.7.0.12", "AttributeCert");
         oidToNameMapping.put("1.3.6.1.5.5.7.1", "PrivateExtension");
@@ -1684,6 +1687,10 @@ public class ObjectIdUtil {
         oidToNameMapping.put("1.3.6.1.5.5.8.1.2", "HmacSHA");
         oidToNameMapping.put("1.3.6.1.5.5.8.1.3", "HmacTiger");
         oidToNameMapping.put("1.3.6.1.5.5.8.2.2", "IKEIntermediate");
+        oidToNameMapping.put("1.3.9999.2.7.1", "p256_Dilithium2");
+        oidToNameMapping.put("1.3.9999.2.7.2", "rsa3072_Dilithium2");
+        oidToNameMapping.put("1.3.9999.2.7.3", "p384_Dilithium3");
+        oidToNameMapping.put("1.3.9999.2.7.4", "p521_Dilithium5");
         oidToNameMapping.put("2.16.528.1.1001.1.1.1.12.6.1.1.1", "DigiNotar EV policy");
         oidToNameMapping.put("2.16.578.1.26.1.3.3", "BuyPass EV policy");
         oidToNameMapping.put("2.16.724.1.2.2.4.1", "PersonalDataInfo");

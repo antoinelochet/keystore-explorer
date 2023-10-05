@@ -389,8 +389,8 @@ public class KeyStoreTableModel extends AbstractTableModel {
             throws CryptoException, GeneralSecurityException {
         if (KeyStoreUtil.isTrustedCertificateEntry(alias, keyStore)) {
             // Get key info from certificate
-            X509Certificate cert = X509CertUtil.convertCertificate(keyStore.getCertificate(alias));
-            return KeyPairUtil.getKeyInfo(cert.getPublicKey());
+            Certificate certificate = keyStore.getCertificate(alias);
+            return KeyPairUtil.getKeyInfo(certificate.getPublicKey());
         } else {
             Certificate[] chain = keyStore.getCertificateChain(alias);
 

@@ -45,7 +45,7 @@ public class PublicKeyFingerprintUtil {
             throws CryptoException {
 
         // workaround for encoding bug in older Java versions
-        PublicKey convertedPublicKey = OpenSslPubUtil.load(publicKey.getEncoded());
+        PublicKey convertedPublicKey = OpenSslPubUtil.load(publicKey);
 
         KeyIdentifierGenerator keyIdentifierGenerator = new KeyIdentifierGenerator(convertedPublicKey);
 

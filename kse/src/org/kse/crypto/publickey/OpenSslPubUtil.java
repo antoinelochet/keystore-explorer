@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.kse.KSE;
 import org.kse.crypto.CryptoException;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.utilities.pem.PemInfo;
 import org.kse.utilities.pem.PemUtil;
 
@@ -134,6 +135,19 @@ public class OpenSslPubUtil {
             return new JcaPEMKeyConverter().setProvider(KSE.BC).getPublicKey(publicKeyInfo);
         } catch (Exception ex) {
             throw new CryptoException(res.getString("NoLoadOpenSslPublicKey.exception.message"), ex);
+        }
+    }
+
+    public static PublicKey load(PublicKey publicKey) throws CryptoException {
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        try {
+            return OpenSslPubUtil.load(publicKeyEncoded);
+        } catch (CryptoException e) {
+            try {
+                return OQSUtils.oqsPublicKeysFromX509PublicKey(publicKey);
+            } catch (CryptoException ex) {
+                throw e;
+            }
         }
     }
 }

@@ -35,6 +35,7 @@ import static org.kse.crypto.digest.DigestType.SHAKE256;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
@@ -83,6 +84,11 @@ public enum SignatureType {
 	SHA256_ECDSA("SHA256withECDSA", "1.2.840.10045.4.3.2", SHA256, "SignatureType.Sha256WithEcDsa"),
 	SHA384_ECDSA("SHA384withECDSA", "1.2.840.10045.4.3.3", SHA384, "SignatureType.Sha384WithEcDsa"),
 	SHA512_ECDSA("SHA512withECDSA", "1.2.840.10045.4.3.4", SHA512, "SignatureType.Sha512WithEcDsa"),
+
+    P256_DILITHIUM2("Dilithium", "1.3.9999.2.7.1", SHA256, "SignatureType.p256_dilithium2"),
+    RSA3072_DILITHIUM2("Dilithium", "1.3.9999.2.7.2", SHA256, "SignatureType.rsa3072_dilithium2"),
+    P384_DILITHIUM3("Dilithium", "1.3.9999.2.7.3", SHA384, "SignatureType.p384_dilithium3"),
+    P521_DILITHIUM5("Dilithium", "1.3.9999.2.7.4", SHA512, "SignatureType.p521_dilithium5"),
 
 	// EdDSA
 	ED25519("Ed25519", EdDSACurves.ED25519.oid().getId(), SHA512, "SignatureType.Ed25519"),

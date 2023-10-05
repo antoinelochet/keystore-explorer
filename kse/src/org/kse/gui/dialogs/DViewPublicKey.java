@@ -19,9 +19,7 @@
  */
 package org.kse.gui.dialogs;
 
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -34,23 +32,15 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import javax.swing.*;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-
+import net.miginfocom.swing.MigLayout;
 import org.bouncycastle.jcajce.provider.asymmetric.edec.BCEdDSAPublicKey;
 import org.kse.KSE;
 import org.kse.crypto.CryptoException;
 import org.kse.crypto.KeyInfo;
 import org.kse.crypto.keypair.KeyPairUtil;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.crypto.publickey.OpenSslPubUtil;
 import org.kse.gui.CursorUtil;
 import org.kse.gui.JEscDialog;
@@ -60,8 +50,6 @@ import org.kse.gui.crypto.JPublicKeyFingerprint;
 import org.kse.gui.error.DError;
 import org.kse.utilities.DialogViewer;
 import org.kse.utilities.asn1.Asn1Exception;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * Displays the details of a public key with the option to display its fields if
@@ -120,8 +108,7 @@ public class DViewPublicKey extends JEscDialog {
 
     private PublicKey convertKey(PublicKey publicKey) throws CryptoException {
         // convert public key object from whatever class it currently is (depends on Java version) to a BC object
-        byte[] publicKeyEncoded = publicKey.getEncoded();
-        return OpenSslPubUtil.load(publicKeyEncoded);
+        return OpenSslPubUtil.load(publicKey);
     }
 
     private void initComponents() throws CryptoException {
@@ -268,7 +255,8 @@ public class DViewPublicKey extends JEscDialog {
         jcfFingerprint.setPublicKey(publicKey);
 
         jbFields.setEnabled((publicKey instanceof RSAPublicKey) || (publicKey instanceof DSAPublicKey) ||
-                            (publicKey instanceof ECPublicKey) || (publicKey instanceof BCEdDSAPublicKey));
+                            (publicKey instanceof ECPublicKey) || (publicKey instanceof BCEdDSAPublicKey) ||
+                            (publicKey instanceof OQSUtils.OQSPublicKey));
     }
 
     private void pemEncodingPressed() {

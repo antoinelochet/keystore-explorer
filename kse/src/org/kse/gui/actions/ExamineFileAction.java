@@ -44,6 +44,7 @@ import org.kse.crypto.csr.pkcs10.Pkcs10Util;
 import org.kse.crypto.csr.spkac.Spkac;
 import org.kse.crypto.filetype.CryptoFileType;
 import org.kse.crypto.filetype.CryptoFileUtil;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.crypto.privatekey.MsPvkUtil;
 import org.kse.crypto.privatekey.OpenSslPvkUtil;
 import org.kse.crypto.privatekey.Pkcs8Util;
@@ -142,6 +143,9 @@ public class ExamineFileAction extends KeyStoreExplorerAction {
                 break;
             case OPENSSL_PUB:
                 openPublicKey(file);
+                break;
+            case OPENSSL_OQS_PUB:
+                openOQSPublicKey(file);
                 break;
             case UNKNOWN:
             default:
@@ -299,6 +303,15 @@ public class ExamineFileAction extends KeyStoreExplorerAction {
     private void openPublicKey(File file) throws IOException, CryptoException {
         byte[] data = decodeIfBase64(FileUtils.readFileToByteArray(file));
         PublicKey publicKey = OpenSslPubUtil.load(data);
+
+        DViewPublicKey dViewPublicKey = new DViewPublicKey(frame, MessageFormat.format(
+                res.getString("ExamineFileAction.PublicKeyDetailsFile.Title"), file.getName()), publicKey);
+        dViewPublicKey.setLocationRelativeTo(frame);
+        dViewPublicKey.setVisible(true);
+    }
+
+    private void openOQSPublicKey(File file) throws IOException, CryptoException {
+        PublicKey publicKey = OQSUtils.getOQSPublicKeyFromPEM(FileUtils.readFileToByteArray(file));
 
         DViewPublicKey dViewPublicKey = new DViewPublicKey(frame, MessageFormat.format(
                 res.getString("ExamineFileAction.PublicKeyDetailsFile.Title"), file.getName()), publicKey);

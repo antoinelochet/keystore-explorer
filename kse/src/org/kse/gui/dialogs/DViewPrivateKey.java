@@ -52,6 +52,7 @@ import org.kse.crypto.CryptoException;
 import org.kse.crypto.KeyInfo;
 import org.kse.crypto.keypair.KeyPairType;
 import org.kse.crypto.keypair.KeyPairUtil;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.gui.CursorUtil;
 import org.kse.gui.JEscDialog;
 import org.kse.gui.LnfUtil;
@@ -297,7 +298,8 @@ public class DViewPrivateKey extends JEscDialog {
         jtaEncoded.setCaretPosition(0);
 
         jbFields.setEnabled((privateKey instanceof RSAPrivateKey) || (privateKey instanceof DSAPrivateKey) ||
-                            (privateKey instanceof ECPrivateKey) || (privateKey instanceof BCEdDSAPrivateKey));
+                            (privateKey instanceof ECPrivateKey) || (privateKey instanceof BCEdDSAPrivateKey) ||
+                            (privateKey instanceof OQSUtils.OQSPrivateKey));
     }
 
     private void pemEncodingPressed() {

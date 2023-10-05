@@ -35,6 +35,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.kse.crypto.CryptoException;
 import org.kse.crypto.digest.DigestType;
 import org.kse.crypto.digest.DigestUtil;
+import org.kse.crypto.pqc.OQSUtils;
 
 /**
  * Generator for public key identifiers of various forms.
@@ -108,6 +109,8 @@ public class KeyIdentifierGenerator {
             encodedPublicKey = encodeRsaPublicKeyAsBitString((RSAPublicKey) publicKey);
         } else if (publicKey instanceof DSAPublicKey) {
             encodedPublicKey = encodeDsaPublicKeyAsBitString((DSAPublicKey) publicKey);
+        } else if (publicKey instanceof OQSUtils.OQSPublicKey) {
+            encodedPublicKey =  publicKey.getEncoded();
         } else {
             SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
             encodedPublicKey = publicKeyInfo.getPublicKeyData().getBytes();

@@ -23,10 +23,10 @@ package org.kse.crypto;
  * Holds information about a key.
  */
 public class KeyInfo {
-    private KeyType keyType;
-    private String algorithm;
-    private Integer size;
-    private String detailedAlgorithm;
+    private final KeyType keyType;
+    private final String algorithm;
+    private final Integer size;
+    private final String detailedAlgorithm;
 
     public KeyInfo(KeyType keyType, String algorithm) {
         this(keyType, algorithm, null, algorithm);

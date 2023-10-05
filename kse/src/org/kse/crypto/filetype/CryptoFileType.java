@@ -114,6 +114,10 @@ public enum CryptoFileType {
      * OpenSSL Public Key
      */
     OPENSSL_PUB("CryptoFileType.OpenSslPub"),
+    /**
+     * OpenSSL+OQS Public Key
+     */
+    OPENSSL_OQS_PUB("CryptoFileType.OpenSslOQSPub"),
 
     /**
      * JAR file (possibly signed and containing certificates)

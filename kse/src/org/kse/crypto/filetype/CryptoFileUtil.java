@@ -20,18 +20,7 @@
 package org.kse.crypto.filetype;
 
 import static org.kse.crypto.csr.CsrType.PKCS10;
-import static org.kse.crypto.filetype.CryptoFileType.CERT;
-import static org.kse.crypto.filetype.CryptoFileType.CRL;
-import static org.kse.crypto.filetype.CryptoFileType.ENC_MS_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.ENC_OPENSSL_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.ENC_PKCS8_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.JAR;
-import static org.kse.crypto.filetype.CryptoFileType.JSON_WEB_TOKEN;
-import static org.kse.crypto.filetype.CryptoFileType.OPENSSL_PUB;
-import static org.kse.crypto.filetype.CryptoFileType.UNENC_MS_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.UNENC_OPENSSL_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.UNENC_PKCS8_PVK;
-import static org.kse.crypto.filetype.CryptoFileType.UNKNOWN;
+import static org.kse.crypto.filetype.CryptoFileType.*;
 import static org.kse.crypto.keystore.KeyStoreType.BCFKS;
 import static org.kse.crypto.keystore.KeyStoreType.BKS;
 import static org.kse.crypto.keystore.KeyStoreType.JCEKS;
@@ -60,6 +49,7 @@ import org.kse.crypto.csr.pkcs10.Pkcs10Util;
 import org.kse.crypto.csr.spkac.Spkac;
 import org.kse.crypto.csr.spkac.SpkacException;
 import org.kse.crypto.keystore.KeyStoreType;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.crypto.privatekey.EncryptionType;
 import org.kse.crypto.privatekey.MsPvkUtil;
 import org.kse.crypto.privatekey.OpenSslPvkUtil;
@@ -152,6 +142,16 @@ public class CryptoFileUtil {
             // Ignore - not an OpenSSL public key file
         } catch (OutOfMemoryError ex) {
             // Ignore - not an OpenSSL public key file, some files cause the
+            // heap space to fill up with the load call
+        }
+
+        try {
+            OQSUtils.getOQSPublicKeyFromPEM(data);
+            return OPENSSL_OQS_PUB;
+        } catch (Exception ex) {
+            // Ignore - not an OpenSSL+OQS public key file
+        } catch (OutOfMemoryError ex) {
+            // Ignore - not an OpenSSL+OQS public key file, some files cause the
             // heap space to fill up with the load call
         }
 

@@ -31,7 +31,11 @@ public enum KeyPairType {
     ECDSA("ECDSA", "1.2.840.10045.2.1", 160, 571, 32),
     EDDSA("EdDSA", "", 256, 456, 200), // for Java >= 15 (there is no specific OID for EdDSA)
     ED25519("Ed25519", "1.3.101.112", 256, 256, 0), // BC has separate key pair types for the two EdDSA types
-    ED448("Ed448", "1.3.101.113", 456, 456, 0);
+    ED448("Ed448", "1.3.101.113", 456, 456, 0),
+    P256_DILITHIUM2("Dilithium", "1.3.9999.2.7.1", 15872, 15872, 0),
+    RSA3072_DILITHIUM2("Dilithium", "1.3.9999.2.7.2", 18688, 18688, 0),
+    P384_DILITHIUM3("Dilithium", "1.3.9999.2.7.3", 16384, 16384, 0),
+    P521_DILITHIUM5("Dilithium", "1.3.9999.2.7.4", 20736, 20736, 0);
 
     /**
      * Set of all EC key pair types (EC, ECDSA, EDDSA, ED25519, ED448)

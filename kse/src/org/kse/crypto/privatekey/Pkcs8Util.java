@@ -55,6 +55,7 @@ import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.kse.KSE;
 import org.kse.crypto.CryptoException;
 import org.kse.crypto.Password;
+import org.kse.crypto.pqc.OQSUtils;
 import org.kse.utilities.pem.PemInfo;
 import org.kse.utilities.pem.PemUtil;
 
@@ -181,6 +182,9 @@ public class Pkcs8Util {
         try {
             // Determine private key algorithm from key bytes
             String privateKeyAlgorithm = getPrivateKeyAlgorithm(pvkBytes);
+            if (OQSUtils.KEYPAIR_TYPE_BY_OID.containsKey(privateKeyAlgorithm)) {
+                return OQSUtils.getOQSPrivateKeyFromPEM(pvkBytes);
+            }
 
             // Convert bytes to private key
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(pvkBytes);

@@ -36,6 +36,7 @@ import java.security.PrivateKey;
 import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAParams;
@@ -264,55 +265,59 @@ public class DProperties extends JEscDialog {
 
             createLastModifiedNode(trustedCertificateNode, alias);
 
-            X509Certificate trustedCertificate = X509CertUtil.convertCertificate(keyStore.getCertificate(alias));
+            Certificate certificate = keyStore.getCertificate(alias);
+            X509Certificate trustedCertificate = X509CertUtil.convertCertificate(certificate);
 
-            populateCertificateNode(trustedCertificateNode, trustedCertificate);
+            populateCertificateNode(trustedCertificateNode, trustedCertificate, certificate);
         } catch (KeyStoreException ex) {
             throw new CryptoException(res.getString("DProperties.NoGetProperties.exception.message"), ex);
         }
     }
 
-    private void populateCertificateNode(DefaultMutableTreeNode certificateNode, X509Certificate certificate)
+    private void populateCertificateNode(DefaultMutableTreeNode certificateNode, X509Certificate x509Certificate, Certificate certificate)
             throws CryptoException {
         try {
             String version = MessageFormat.format(res.getString("DProperties.properties.Version"),
-                                                  "" + certificate.getVersion());
+                                                  "" + x509Certificate.getVersion());
             certificateNode.add(new DefaultMutableTreeNode(version));
 
             String subject = MessageFormat.format(res.getString("DProperties.properties.Subject"),
                                                   X500NameUtils.x500PrincipalToX500Name(
-                                                          certificate.getSubjectX500Principal()));
+                                                          x509Certificate.getSubjectX500Principal()));
             certificateNode.add(new DefaultMutableTreeNode(subject));
 
             String issuer = MessageFormat.format(res.getString("DProperties.properties.Issuer"),
                                                  X500NameUtils.x500PrincipalToX500Name(
-                                                         certificate.getIssuerX500Principal()));
+                                                         x509Certificate.getIssuerX500Principal()));
             certificateNode.add(new DefaultMutableTreeNode(issuer));
 
             String serialNumber = MessageFormat.format(res.getString("DProperties.properties.SerialNumber"),
                                                        new BigInteger(
-                                                               certificate.getSerialNumber().toByteArray()).toString(16)
+                                                               x509Certificate.getSerialNumber().toByteArray()).toString(16)
                                                                                                            .toUpperCase());
             certificateNode.add(new DefaultMutableTreeNode(serialNumber));
 
-            Date validFromDate = certificate.getNotBefore();
+            Date validFromDate = x509Certificate.getNotBefore();
             String validFrom = MessageFormat.format(res.getString("DProperties.properties.ValidFrom"),
                                                     StringUtils.formatDate(validFromDate));
             certificateNode.add(new DefaultMutableTreeNode(validFrom));
 
-            Date validUntilDate = certificate.getNotAfter();
+            Date validUntilDate = x509Certificate.getNotAfter();
             String validUntil = MessageFormat.format(res.getString("DProperties.properties.ValidUntil"),
                                                      StringUtils.formatDate(validUntilDate));
             certificateNode.add(new DefaultMutableTreeNode(validUntil));
 
-            createPublicKeyNodes(certificateNode, certificate);
+            createPublicKeyNodes(certificateNode, x509Certificate, certificate);
 
             String signatureAlgorithm = MessageFormat.format(res.getString("DProperties.properties.SignatureAlgorithm"),
                                                              X509CertUtil.getCertificateSignatureAlgorithm(
-                                                                     certificate));
+                                                                     x509Certificate));
             certificateNode.add(new DefaultMutableTreeNode(signatureAlgorithm));
 
-            byte[] cert = certificate.getEncoded();
+            byte[] cert = x509Certificate.getEncoded();
+            if (cert == null && certificate != null) {
+                cert = certificate.getEncoded();
+            }
 
             String md5 = MessageFormat.format(res.getString("DProperties.properties.Md5Fingerprint"),
                                               DigestUtil.getFriendlyMessageDigest(cert, DigestType.MD5));
@@ -326,9 +331,13 @@ public class DProperties extends JEscDialog {
         }
     }
 
-    private void createPublicKeyNodes(DefaultMutableTreeNode parentNode, X509Certificate certificate)
+    private void createPublicKeyNodes(DefaultMutableTreeNode parentNode, X509Certificate x509Certificate, Certificate certificate)
             throws CryptoException {
-        createPublicKeyNodes(parentNode, certificate.getPublicKey());
+        PublicKey publicKey = x509Certificate.getPublicKey();
+        if (publicKey == null && certificate != null) {
+            publicKey = certificate.getPublicKey();
+        }
+        createPublicKeyNodes(parentNode, publicKey);
     }
 
     private void createPublicKeyNodes(DefaultMutableTreeNode parentNode, PublicKey publicKey) throws CryptoException {
@@ -452,7 +461,7 @@ public class DProperties extends JEscDialog {
                         X509CertUtil.getShortName(certificate));
                 certificatesNode.add(certificateNode);
 
-                populateCertificateNode(certificateNode, certificate);
+                populateCertificateNode(certificateNode, certificate, certificate);
             }
         } catch (KeyStoreException ex) {
             throw new CryptoException(res.getString("DProperties.NoGetProperties.exception.message"), ex);
